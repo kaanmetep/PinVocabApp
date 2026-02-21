@@ -8,7 +8,18 @@ module.exports = {
   ],
   presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'pinvocab-bg': '#DED9D1',
+        'pinvocab-text': '#222220',
+      },
+      fontFamily: {
+        'pinvocab': ['GFSDidot-Regular'],
+        'roboto': ['Roboto-Regular'],
+        'roboto-medium': ['Roboto-Medium'],
+        'roboto-bold': ['Roboto-Bold'],
+      },
+    },
   },
   plugins: [],
 };
