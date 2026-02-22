@@ -267,7 +267,7 @@ export default function TakeQuiz({
                             className="text-pinvocab-text text-xs opacity-60"
                             style={{ fontFamily: 'Roboto-Regular' }}
                           >
-                            Quiz from all words in this category
+                            Quiz from all words
                           </Text>
                         </View>
                       </View>

@@ -1,5 +1,6 @@
 import TakeQuiz from '@/components/quick-actions/take-quiz/TakeQuiz';
 import WordCollections from '@/components/quick-actions/word-collections/WordCollections';
+import WordDetails from '@/components/word-details/WordDetails';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
@@ -70,6 +71,7 @@ export default function Home({ onLogout, userName = 'Kaan' }: HomeProps) {
   const [timeRemaining, setTimeRemaining] = useState(3 * 60 * 60); // 3 hours in seconds
   const [showWordCollections, setShowWordCollections] = useState(false);
   const [showTakeQuiz, setShowTakeQuiz] = useState(false);
+  const [showWordDetails, setShowWordDetails] = useState(false);
   const [userLevel, setUserLevel] = useState<string>('B1'); // Default level (Intermediate)
   const [selectedCategory, setSelectedCategory] = useState<string>('general'); // Default category
   
@@ -330,6 +332,28 @@ export default function Home({ onLogout, userName = 'Kaan' }: HomeProps) {
                 >
                   {todayWord.definition}
                 </Text>
+
+                {/* See More Details Button */}
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  className="flex-row items-center self-end mt-3"
+                  onPress={() => {
+                    setShowWordDetails(true);
+                  }}
+                >
+                  <Text 
+                    className="text-pinvocab-bg text-xs opacity-70 mr-1"
+                    style={{ fontFamily: 'Roboto-Regular' }}
+                  >
+                    See More Details
+                  </Text>
+                  <Ionicons 
+                    name="chevron-forward-outline" 
+                    size={14} 
+                    color="#DED9D1" 
+                    style={{ opacity: 0.7 }} 
+                  />
+                </TouchableOpacity>
               </View>
             </View>
           </Animated.View>
@@ -619,6 +643,13 @@ export default function Home({ onLogout, userName = 'Kaan' }: HomeProps) {
           console.log('Starting quiz:', { quizType, category });
           // TODO: Navigate to quiz screen
         }}
+      />
+
+      {/* Word Details Modal */}
+      <WordDetails
+        visible={showWordDetails}
+        onClose={() => setShowWordDetails(false)}
+        word={todayWord}
       />
     </SafeAreaView>
   );

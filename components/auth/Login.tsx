@@ -489,7 +489,7 @@ export default function Login({ onLoginSuccess, onNavigateToSignUp }: LoginProps
                 className="text-pinvocab-text text-[10px] opacity-40 mt-1"
                 style={{ fontFamily: 'Roboto-Regular' }}
               >
-                v{Constants.expoConfig?.version || '1.0.0'}
+                PinVocab v{Constants.expoConfig?.version || '1.0.0'}
               </Text>
             </View>
           </Animated.View>

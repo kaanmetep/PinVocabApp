@@ -19,18 +19,54 @@ const exampleCards = [
     word: 'Beautiful',
     type: '(adj.)',
     definition: 'Pleasing to the senses or mind aesthetically.',
+    pronunciation: '/ˈbjuːtɪf(ə)l/',
+    category: 'general',
+    level: 'B1',
   },
   {
     word: 'Serendipity',
     type: '(n.)',
     definition: 'The occurrence of pleasant things that are not expected.',
+    pronunciation: '/ˌserənˈdipitē/',
+    category: 'general',
+    level: 'B1',
   },
   {
     word: 'Eloquent',
     type: '(adj.)',
     definition: 'Fluent or persuasive in speaking or writing.',
+    pronunciation: '/ˈeləkwənt/',
+    category: 'general',
+    level: 'B1',
   },
 ];
+
+// Category names mapping
+const categoryNames: Record<string, string> = {
+  general: 'General',
+  daily: 'Daily Conversation',
+  travel: 'Travel & Tourism',
+  food: 'Food & Dining',
+  business: 'Business English',
+  academic: 'Academic Words',
+  technology: 'Technology',
+  medical: 'Medical Terms',
+  legal: 'Legal Terms',
+  literature: 'Literature & Arts',
+  science: 'Science & Nature',
+  phrasal: 'Phrasal Verbs',
+  idioms: 'Idioms',
+};
+
+// English levels mapping
+const englishLevels: Record<string, string> = {
+  A1: 'Beginner',
+  A2: 'Elementary',
+  B1: 'Intermediate',
+  B2: 'Upper Intermediate',
+  C1: 'Advanced',
+  C2: 'Proficient',
+};
 
 export default function OnboardingStep1({ onContinue }: OnboardingStep1Props) {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -534,40 +570,68 @@ export default function OnboardingStep1({ onContinue }: OnboardingStep1Props) {
           {/* Example Cards */}
           <Animated.View style={[{ marginTop: 24, alignSelf: 'center', minWidth: 320, maxWidth: '90%' }, cardAnimatedStyle]}>
             <View 
-              className="px-6 py-5 rounded-sm"
-              style={{ backgroundColor: 'rgba(34, 34, 32, 0.75)', height: 140 }}
+              className="px-6 py-6 rounded-sm"
+              style={{ backgroundColor: 'rgba(34, 34, 32, 0.75)' }}
             >
-              {/* Word and Type */}
-              <View className="flex-row items-baseline justify-between mb-3">
-                <View className="flex-row items-baseline flex-1">
-                  <Text 
-                    className="text-pinvocab-bg text-2xl tracking-tight mr-3"
-                    style={{ fontFamily: 'Roboto-Bold' }}
+                {/* Category Badge */}
+                <View className="flex-row items-center mb-2">
+                  <View 
+                    className="px-1.5 py-0.5 rounded-sm self-start"
+                    style={{ backgroundColor: 'rgba(222, 217, 209, 0.15)' }}
                   >
-                    {exampleCards[currentCardIndex].word}
-                  </Text>
-                  <Text 
-                    className="text-pinvocab-bg text-sm opacity-70"
-                    style={{ fontFamily: 'Roboto-Regular' }}
-                  >
-                    {exampleCards[currentCardIndex].type}
-                  </Text>
+                    <Text 
+                      className="text-pinvocab-bg"
+                      style={{ fontFamily: 'Roboto-Medium', opacity: 0.8, fontSize: 10 }}
+                    >
+                      {exampleCards[currentCardIndex].category === 'general' 
+                        ? `${categoryNames[exampleCards[currentCardIndex].category]} (${englishLevels[exampleCards[currentCardIndex].level] || exampleCards[currentCardIndex].level})`
+                        : categoryNames[exampleCards[currentCardIndex].category] || 'General'
+                      }
+                    </Text>
+                  </View>
                 </View>
-                <Ionicons 
-                  name="volume-high" 
-                  size={20} 
-                  color="#DED9D1" 
-                  style={{ opacity: 0.8 }}
-                />
-              </View>
-              
-              {/* Definition */}
-              <Text 
-                className="text-pinvocab-bg text-base leading-relaxed opacity-90"
-                style={{ fontFamily: 'Roboto-Regular' }}
-              >
-                {exampleCards[currentCardIndex].definition}
-              </Text>
+                
+                {/* Word and Type */}
+                <View className="flex-row items-baseline justify-between mb-3">
+                  <View className="flex-row items-baseline flex-1">
+                    <Text 
+                      className="text-pinvocab-bg text-3xl tracking-tight mr-3"
+                      style={{ fontFamily: 'Roboto-Bold' }}
+                    >
+                      {exampleCards[currentCardIndex].word}
+                    </Text>
+                    <Text 
+                      className="text-pinvocab-bg text-sm opacity-70"
+                      style={{ fontFamily: 'Roboto-Regular' }}
+                    >
+                      {exampleCards[currentCardIndex].type}
+                    </Text>
+                  </View>
+                  <TouchableOpacity activeOpacity={0.7}>
+                    <Ionicons 
+                      name="volume-high" 
+                      size={22} 
+                      color="#DED9D1" 
+                      style={{ opacity: 0.9 }}
+                    />
+                  </TouchableOpacity>
+                </View>
+                
+                {/* Pronunciation */}
+                <Text 
+                  className="text-pinvocab-bg text-xs opacity-60 mb-3"
+                  style={{ fontFamily: 'Roboto-Regular' }}
+                >
+                  {exampleCards[currentCardIndex].pronunciation}
+                </Text>
+                
+                {/* Definition */}
+                <Text 
+                  className="text-pinvocab-bg text-base leading-relaxed opacity-90"
+                  style={{ fontFamily: 'Roboto-Regular' }}
+                >
+                  {exampleCards[currentCardIndex].definition}
+                </Text>
             </View>
           </Animated.View>
         </View>
