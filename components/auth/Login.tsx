@@ -12,9 +12,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface LoginProps {
   onLoginSuccess?: () => void;
+  onNavigateToSignUp?: () => void;
 }
 
-export default function Login({ onLoginSuccess }: LoginProps) {
+export default function Login({ onLoginSuccess, onNavigateToSignUp }: LoginProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -392,7 +393,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 >
                   Don't have an account?{' '}
                 </Text>
-                <TouchableOpacity activeOpacity={0.7}>
+                <TouchableOpacity 
+                  activeOpacity={0.7}
+                  onPress={onNavigateToSignUp}
+                >
                   <Text 
                     className="text-pinvocab-text text-sm"
                     style={{ fontFamily: 'Roboto-Bold' }}
