@@ -104,7 +104,7 @@ export default function OnboardingStep2({ onContinue }: OnboardingStep2Props) {
                   className="text-pinvocab-text text-xs tracking-wide opacity-70"
                   style={{ fontFamily: 'Roboto-Regular' }}
                 >
-                  Step 2/3
+                  Step 1/2
                 </Text>
               </View>
             </Animated.View>

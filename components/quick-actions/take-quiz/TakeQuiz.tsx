@@ -209,7 +209,7 @@ export default function TakeQuiz({
                     >
                       <View className="flex-row items-center flex-1">
                         <Ionicons 
-                          name="checkmark-circle-outline" 
+                          name="eye-outline" 
                           size={20} 
                           color="#222220" 
                           style={{ opacity: 0.7, marginRight: 10 }}

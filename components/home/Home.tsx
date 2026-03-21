@@ -1,9 +1,14 @@
+import RecentWords from '@/components/home/RecentWords';
+import Profile from '@/components/profile/Profile';
 import TakeQuiz from '@/components/quick-actions/take-quiz/TakeQuiz';
 import WordCollections from '@/components/quick-actions/word-collections/WordCollections';
+import Settings from '@/components/settings/Settings';
+import Upgrade from '@/components/upgrade/Upgrade';
 import WordDetails from '@/components/word-details/WordDetails';
+import WordFrequencyDialog from '@/components/WordFrequencyDialog';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -68,10 +73,19 @@ const englishLevels: Record<string, string> = {
 
 
 export default function Home({ onLogout, userName = 'Kaan' }: HomeProps) {
+  const [wordFrequencyHours, setWordFrequencyHours] = useState<string>('3'); // Default: every 3 hours
   const [timeRemaining, setTimeRemaining] = useState(3 * 60 * 60); // 3 hours in seconds
   const [showWordCollections, setShowWordCollections] = useState(false);
   const [showTakeQuiz, setShowTakeQuiz] = useState(false);
   const [showWordDetails, setShowWordDetails] = useState(false);
+  const [showFrequencyDialog, setShowFrequencyDialog] = useState(false);
+  const [showFrequencyWarning, setShowFrequencyWarning] = useState(false);
+  const [pendingFrequency, setPendingFrequency] = useState<string | null>(null);
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showRecentWords, setShowRecentWords] = useState(false);
   const [userLevel, setUserLevel] = useState<string>('B1'); // Default level (Intermediate)
   const [selectedCategory, setSelectedCategory] = useState<string>('general'); // Default category
   
@@ -86,11 +100,18 @@ export default function Home({ onLogout, userName = 'Kaan' }: HomeProps) {
   const recentWordsTranslateY = useSharedValue(20);
 
   useEffect(() => {
+    // Reset timer when frequency changes
+    const hours = parseInt(wordFrequencyHours);
+    setTimeRemaining(hours * 60 * 60);
+  }, [wordFrequencyHours]);
+
+  useEffect(() => {
     // Update timer every second
     const timerInterval = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 0) {
-          return 3 * 60 * 60; // Reset to 3 hours when it reaches 0
+          const hours = parseInt(wordFrequencyHours);
+          return hours * 60 * 60; // Reset to selected hours when it reaches 0
         }
         return prev - 1;
       });
@@ -175,6 +196,45 @@ export default function Home({ onLogout, userName = 'Kaan' }: HomeProps) {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const handleFrequencySelect = (frequency: string) => {
+    if (frequency !== wordFrequencyHours) {
+      // Show warning if changing frequency
+      setPendingFrequency(frequency);
+      setShowFrequencyWarning(true);
+    } else {
+      setShowFrequencyDialog(false);
+    }
+  };
+
+  const handleFrequencyConfirm = () => {
+    if (pendingFrequency) {
+      setWordFrequencyHours(pendingFrequency);
+      setPendingFrequency(null);
+      setShowFrequencyWarning(false);
+      setShowFrequencyDialog(false);
+    }
+  };
+
+  const handleFrequencyCancel = () => {
+    setPendingFrequency(null);
+    setShowFrequencyWarning(false);
+    setShowFrequencyDialog(false);
+  };
+
+  // Show Upgrade page if requested
+  if (showUpgrade) {
+    return (
+      <Upgrade
+        onClose={() => setShowUpgrade(false)}
+        onUpgradeSuccess={() => {
+          setShowUpgrade(false);
+          // TODO: Handle successful upgrade
+          console.log('Upgrade successful');
+        }}
+      />
+    );
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-pinvocab-bg">
       <View className="flex-1">
@@ -204,8 +264,7 @@ export default function Home({ onLogout, userName = 'Kaan' }: HomeProps) {
                 <TouchableOpacity
                   activeOpacity={0.7}
                   onPress={() => {
-                    // TODO: Navigate to upgrade
-                    console.log('Upgrade');
+                    setShowUpgrade(true);
                   }}
                 >
                   <Text 
@@ -221,8 +280,7 @@ export default function Home({ onLogout, userName = 'Kaan' }: HomeProps) {
               <TouchableOpacity 
                 activeOpacity={0.7}
                 onPress={() => {
-                  // TODO: Navigate to settings
-                  console.log('Settings');
+                  setShowSettings(true);
                 }}
               >
                 <Ionicons 
@@ -232,24 +290,26 @@ export default function Home({ onLogout, userName = 'Kaan' }: HomeProps) {
                   style={{ opacity: 0.7 }}
                 />
               </TouchableOpacity>
-              <TouchableOpacity 
-                activeOpacity={0.7}
-                onPress={() => {
-                  // TODO: Navigate to profile
-                  console.log('Profile');
-                }}
-              >
-                <View 
-                  className="w-10 h-10 rounded-full items-center justify-center"
-                  style={{ backgroundColor: 'rgba(34, 34, 32, 0.1)' }}
+              <View>
+                <TouchableOpacity 
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    setShowProfileDropdown(!showProfileDropdown);
+                  }}
                 >
-                  <Ionicons 
-                    name="person-outline" 
-                    size={20} 
-                    color="#222220" 
-                  />
-                </View>
-              </TouchableOpacity>
+                  <View 
+                    className="w-10 h-10 rounded-full items-center justify-center"
+                    style={{ backgroundColor: 'rgba(34, 34, 32, 0.1)' }}
+                  >
+                    <Ionicons 
+                      name="person-outline" 
+                      size={20} 
+                      color="#222220" 
+                    />
+                  </View>
+                </TouchableOpacity>
+                
+              </View>
             </View>
           </View>
         </Animated.View>
@@ -265,12 +325,25 @@ export default function Home({ onLogout, userName = 'Kaan' }: HomeProps) {
                 >
                   Current Word
                 </Text>
-                <Text 
-                  className="text-pinvocab-text text-xs opacity-60"
-                  style={{ fontFamily: 'Roboto-Regular' }}
-                >
-                  {formatTimer(timeRemaining)}
-                </Text>
+                <View className="flex-row items-center gap-2">
+                  <Text 
+                    className="text-pinvocab-text text-xs opacity-60"
+                    style={{ fontFamily: 'Roboto-Regular' }}
+                  >
+                    {formatTimer(timeRemaining)}
+                  </Text>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => setShowFrequencyDialog(true)}
+                  >
+                    <Text 
+                      className="text-pinvocab-text text-xs opacity-50"
+                      style={{ fontFamily: 'Roboto-Regular' }}
+                    >
+                      Change
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
               <View 
                 className="px-6 py-6 rounded-sm"
@@ -540,7 +613,7 @@ export default function Home({ onLogout, userName = 'Kaan' }: HomeProps) {
                   className="text-pinvocab-text text-sm"
                   style={{ fontFamily: 'Roboto-Medium' }}
                 >
-                  Word Collections
+                  Change Learning Area
                 </Text>
               </TouchableOpacity>
             </View>
@@ -559,7 +632,10 @@ export default function Home({ onLogout, userName = 'Kaan' }: HomeProps) {
             >
               Recent Words
             </Text>
-            <TouchableOpacity activeOpacity={0.7}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => setShowRecentWords(true)}
+            >
               <Text 
                 className="text-pinvocab-text text-xs opacity-60"
                 style={{ fontFamily: 'Roboto-Regular' }}
@@ -577,8 +653,7 @@ export default function Home({ onLogout, userName = 'Kaan' }: HomeProps) {
                 className="px-4 py-4 rounded-sm"
                 style={{ backgroundColor: 'rgba(34, 34, 32, 0.05)' }}
                 onPress={() => {
-                  // TODO: View word details
-                  console.log('Word details:', word.word);
+                  setShowWordDetails(true);
                 }}
               >
                 <View className="flex-row items-baseline justify-between">
@@ -651,6 +726,199 @@ export default function Home({ onLogout, userName = 'Kaan' }: HomeProps) {
         onClose={() => setShowWordDetails(false)}
         word={todayWord}
       />
+
+      {/* Word Frequency Dialog */}
+      <WordFrequencyDialog
+        visible={showFrequencyDialog}
+        onClose={handleFrequencyCancel}
+        currentFrequency={wordFrequencyHours}
+        onConfirm={handleFrequencySelect}
+        showWarning={showFrequencyWarning}
+        pendingFrequency={pendingFrequency}
+        onWarningConfirm={handleFrequencyConfirm}
+        onWarningCancel={handleFrequencyCancel}
+      />
+
+      {/* Profile Modal */}
+      <Profile
+        visible={showProfile}
+        onClose={() => setShowProfile(false)}
+        userName={userName}
+        userLevel={userLevel}
+        currentCategoryName={categoryNames[selectedCategory] || 'General'}
+        currentPlan="Premium"
+        premiumStartedAt="2026-03-01"
+        premiumRenewsAt="2027-03-01"
+        onManageSubscription={() => {
+          console.log('Manage Premium');
+        }}
+        onCancelPremium={() => {
+          console.log('Cancel Premium');
+        }}
+      />
+
+      {/* Settings Modal */}
+      <Settings
+        visible={showSettings}
+        onClose={() => setShowSettings(false)}
+        onWordFrequency={() => {
+          setShowFrequencyDialog(true);
+        }}
+        onChangeLearningArea={() => {
+          setShowWordCollections(true);
+        }}
+        onRateApp={() => {
+          console.log('Rate App');
+        }}
+        onPrivacyPolicy={() => {
+          // TODO: Navigate to Privacy Policy
+          console.log('Privacy Policy');
+        }}
+        onTermsOfService={() => {
+          // TODO: Navigate to Terms of Service
+          console.log('Terms of Service');
+        }}
+        onContactUs={() => {
+          // TODO: Navigate to Contact Us
+          console.log('Contact Us');
+        }}
+      />
+
+      <RecentWords
+        visible={showRecentWords}
+        onClose={() => setShowRecentWords(false)}
+        words={recentWords}
+        onWordPress={() => {
+          setShowRecentWords(false);
+          setShowWordDetails(true);
+        }}
+      />
+
+      {/* Profile Dropdown Modal */}
+      <Modal
+        visible={showProfileDropdown}
+        transparent={true}
+        animationType="none"
+        onRequestClose={() => setShowProfileDropdown(false)}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => setShowProfileDropdown(false)}
+          className="flex-1"
+          style={{ backgroundColor: 'transparent' }}
+        >
+          <View className="flex-1" style={{ paddingTop: 60, paddingRight: 32, alignItems: 'flex-end' }}>
+            <View
+              style={{ 
+                backgroundColor: '#DED9D1',
+                borderRadius: 12,
+                minWidth: 160,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.15,
+                shadowRadius: 16,
+                elevation: 8,
+                overflow: 'hidden',
+              }}
+            >
+              <TouchableOpacity
+                activeOpacity={0.6}
+                onPress={() => {
+                  setShowProfileDropdown(false);
+                  setShowProfile(true);
+                }}
+                style={{ 
+                  paddingHorizontal: 16,
+                  paddingVertical: 14,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: 'transparent',
+                }}
+              >
+                <View 
+                  style={{ 
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    backgroundColor: 'rgba(34, 34, 32, 0.08)',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: 12,
+                  }}
+                >
+                  <Ionicons 
+                    name="person-outline" 
+                    size={18} 
+                    color="#222220" 
+                    style={{ opacity: 0.8 }}
+                  />
+                </View>
+                <Text 
+                  className="text-pinvocab-text"
+                  style={{ 
+                    fontFamily: 'Roboto-Medium',
+                    fontSize: 15,
+                  }}
+                >
+                  Profile
+                </Text>
+              </TouchableOpacity>
+              
+              <View 
+                style={{ 
+                  height: 1,
+                  backgroundColor: 'rgba(34, 34, 32, 0.08)',
+                  marginHorizontal: 12,
+                }}
+              />
+              
+              <TouchableOpacity
+                activeOpacity={0.6}
+                onPress={() => {
+                  setShowProfileDropdown(false);
+                  onLogout?.();
+                }}
+                style={{ 
+                  paddingHorizontal: 16,
+                  paddingVertical: 14,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: 'transparent',
+                }}
+              >
+                <View 
+                  style={{ 
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    backgroundColor: 'rgba(34, 34, 32, 0.08)',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: 12,
+                  }}
+                >
+                  <Ionicons 
+                    name="log-out-outline" 
+                    size={18} 
+                    color="#222220" 
+                    style={{ opacity: 0.8 }}
+                  />
+                </View>
+                <Text 
+                  className="text-pinvocab-text"
+                  style={{ 
+                    fontFamily: 'Roboto-Medium',
+                    fontSize: 15,
+                  }}
+                >
+                  Logout
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
     </SafeAreaView>
   );
 }
