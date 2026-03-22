@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Modal, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface SettingsProps {
@@ -11,6 +12,8 @@ interface SettingsProps {
   onPrivacyPolicy?: () => void;
   onTermsOfService?: () => void;
   onContactUs?: () => void;
+  notificationsEnabled?: boolean;
+  onNotificationsToggle?: (enabled: boolean) => void;
 }
 
 export default function Settings({
@@ -22,7 +25,20 @@ export default function Settings({
   onPrivacyPolicy,
   onTermsOfService,
   onContactUs,
+  notificationsEnabled = true,
+  onNotificationsToggle,
 }: SettingsProps) {
+  const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(notificationsEnabled);
+
+  useEffect(() => {
+    setIsNotificationsEnabled(notificationsEnabled);
+  }, [notificationsEnabled]);
+
+  const handleNotificationsToggle = (enabled: boolean) => {
+    setIsNotificationsEnabled(enabled);
+    onNotificationsToggle?.(enabled);
+  };
+
   const settingsItems = [
     {
       icon: 'mail-outline',
@@ -122,6 +138,47 @@ export default function Settings({
           contentContainerStyle={{ paddingBottom: 24 }}
         >
           <View className="px-8 pt-6">
+            <Text
+              className="text-pinvocab-text text-sm mb-3 opacity-70"
+              style={{ fontFamily: 'Roboto-Medium' }}
+            >
+              Notifications
+            </Text>
+
+            <View
+              className="px-4 py-3 rounded-sm mb-5 flex-row items-center justify-between"
+              style={{ backgroundColor: 'rgba(34, 34, 32, 0.05)' }}
+            >
+              <View className="flex-row items-center flex-1 mr-3">
+                <Ionicons
+                  name="notifications-outline"
+                  size={18}
+                  color="#222220"
+                  style={{ opacity: 0.7, marginRight: 10 }}
+                />
+                <View className="flex-1">
+                  <Text
+                    className="text-pinvocab-text text-sm"
+                    style={{ fontFamily: 'Roboto-Medium' }}
+                  >
+                    Notifications
+                  </Text>
+                  <Text
+                    className="text-pinvocab-text text-xs opacity-60"
+                    style={{ fontFamily: 'Roboto-Regular' }}
+                  >
+                    Receive reminders for words and quizzes.
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={isNotificationsEnabled}
+                onValueChange={handleNotificationsToggle}
+                trackColor={{ false: 'rgba(34, 34, 32, 0.2)', true: '#222220' }}
+                thumbColor="#fff"
+              />
+            </View>
+
             {/* Section title */}
             <Text
               className="text-pinvocab-text text-sm mb-3 opacity-70"
